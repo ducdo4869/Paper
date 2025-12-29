@@ -1,0 +1,65 @@
+
+%% GA PID TUNING - MAIN SCRIPT
+clear; clc; close all;
+
+%% 1) ĐỊNH NGHĨA PLANT (chỉnh theo hệ của bạn)
+lb = [0   0   0];       % [Kp Ki Kd] lower bound% Ví dụ: G(s) = 1 / (s^2 + 10s + 20)
+ub = [200 200 50];      % [Kp Ki Kd] upper bound
+
+%% 4) THIẾT LẬP GA
+nvars = 3; % Kp Ki Kd
+
+% Hàm fitness
+fitnessFcn = @(x) pid_fitness(x, G, t, r);
+
+opts = optimoptions('ga', ...
+    'PopulationSize', 60, ...
+    'MaxGenerations', 80, ...
+    'EliteCount', 4, ...
+    'CrossoverFraction', 0.8, ...
+    'MutationFcn', {@mutationgaussian, 0.2, 0.5}, ...
+    'SelectionFcn', @selectiontournament, ...
+    'Display', 'iter', ...
+    'PlotFcn', {@gaplotbestf, @gaplotstopping});
+
+%% 5) CHẠY GA
+[xbest, fbest] = ga(fitnessFcn, nvars, [], [], [], [], lb, ub, [], opts);
+
+Kp = xbest(1); Ki = xbest(2); Kd = xbest(3);
+
+fprintf('\n=== KẾT QUẢ GA PID ===\n');
+fprintf('Kp = %.6f\nKi = %.6f\nKd = %.6f\nCost = %.6f\n', Kp, Ki, Kd, fbest);
+
+%% 6) KIỂM TRA ĐÁP ỨNG VỚI PID TỐI ƯU
+C = pid(Kp, Ki, Kd);      % PID dạng song song
+Tcl = feedback(C*G, 1);   % closed-loop
+
+y = lsim(Tcl, r, t);
+e = r - y;
+
+figure;
+subplot(2,1,1);
+plot(t, r, 'k--', 'LineWidth', 1.2); hold on;
+plot(t, y, 'b', 'LineWidth', 1.6);
+grid on;
+xlabel('Time (s)'); ylabel('Output');
+legend('Reference','Output');
+title('Closed-loop response with GA-tuned PID');
+
+subplot(2,1,2);
+plot(t, e, 'r', 'LineWidth', 1.2);
+grid on;
+xlabel('Time (s)'); ylabel('Error');
+title('Tracking error');
+num = 1;
+den = [1 10 20];
+G = tf(num, den);
+
+%% 2) THỜI GIAN MÔ PHỎNG & TÍN HIỆU THAM CHIẾU
+Tend = 10;              % thời gian mô phỏng (s)
+dt   = 1e-3;            % bước thời gian
+t    = 0:dt:Tend;
+r    = ones(size(t));   % bước 1 (step)
+
+%% 3) GIỚI HẠN THAM SỐ PID (quan trọng!)
+% Bạn nên đặt dựa trên hiểu biết hệ để GA tìm nhanh hơn
