@@ -1,0 +1,52 @@
+
+function J = pid_fitness(x, G, t, r)
+% x = [Kp Ki Kd]
+Kp = x(1); Ki = x(2); Kd = x(3);
+
+% PID chuẩn: C = pid(Kp, Ki, Kd)% 1) PID (có thể thêm lọc đạo hàm để giảm nhiễu)
+% PID có lọc đạo hàm: C = pid(Kp, Ki, Kd, 1/N), N lớn => lọc nhẹ
+C = pid(Kp, Ki, Kd);
+
+% 2) Closed-loop
+Tcl = feedback(C*G, 1);
+
+% Nếu hệ không ổn định => phạt rất lớn
+try
+    y = lsim(Tcl, r, t);
+catch
+    J = 1e12;
+    return;
+end
+
+% Nếu có NaN/Inf => phạt
+if any(isnan(y)) || any(isinf(y))
+    J = 1e12;
+    return;
+end
+
+e = r - y;
+
+% 3) TÍNH COST (chọn 1 hoặc kết hợp)
+dt = t(2) - t(1);
+
+% ITAE (thường cho đáp ứng mượt)
+J_itae = sum(t(:).*abs(e(:))) * dt;
+
+% Phạt overshoot (nếu bạn muốn giảm vọt lố)
+OS = max(0, max(y) - 1);      % vượt quá 1 (step)
+J_os = 50 * OS^2;
+
+% Phạt thời gian xác lập xấp xỉ (dựa trên sai số cuối)
+e_end = mean(abs(e(end-round(0.1/dt):end))); % trung bình 0.1s cuối
+J_ss = 200 * e_end;
+
+% Tổng hợp
+J = J_itae + J_os + J_ss;
+
+% 4) Phạt nếu closed-loop không ổn định (dựa trên pole)
+p = pole(Tcl);
+if any(real(p) > 0)
+    J = J + 1e10;
+end
+
+end
