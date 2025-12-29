@@ -1,0 +1,41 @@
+1. Mô hình hóa xi lanh thủy lực
+Các ký hiệu chính:
+ps​: Áp suất cấp dầu của hệ thống.
+p0​: Áp suất hồi dầu.
+q1, q2​: Lưu lượng dầu vào và ra khỏi xi lanh.
+xv​: Độ dịch chuyển của con trượt van.
+p1,p2​: Áp suất tại buồng dầu vào và buồng dầu hồi.
+Cep,Cip​: Hệ số rò rỉ ngoài và trong của xi lanh.
+Ap​: Diện tích piston.
+mt​: Khối lượng quy đổi của piston và tải.
+FL​: Lực tải ngẫu nhiên.
+xp: Vị trí piston.
+Phương trình tuyến tính hóa lưu lượng của van được biểu diễn như sau:
+qL​=Kq​.xv​−Ke.​pL
+Trong đó, qL​ là lưu lượng tải của hệ thống; Kq​ là hệ số khuếch đại lưu lượng của van trượt; và Ke​ là hệ số áp suất của van trượt. 
+Do hiện tượng rò rỉ và ảnh hưởng của tính nén của chất lỏng, lưu lượng vào và ra khỏi xi lanh thủy lực không bằng nhau. Để đơn giản hóa quá trình phân tích, qL​ được định nghĩa là:
+qL​=(q1​+q2)/2
+​​Dựa vào lưu lượng vào q1, lưu lượng ra q2​ có thể được xác định.
+qL​=Ap(dxp/dt)​​+Ctp.​pL​+(Vt/4βe​).​​(dpL/dt)
+​​Trong đó, Ctp​ là hệ số rò rỉ tổng của xi lanh thủy lực; Ctp=Cip+Cep/2; Vt là thể tích nén tổng của buồng làm việc của xi lanh thủy lực; và Vt=V1+V2; βe​ là mô đun đàn hồi thể tích hiệu dụng. 
+Đặc tính tải sẽ ảnh hưởng đến đặc tính động của phần tử nguồn thủy lực, và lực tải thường bao gồm lực cản, lực quán tính, lực đàn hồi, v.v. Phương trình cân bằng giữa lực đầu ra của xi lanh thủy lực và lực tải được biểu diễn trong Phương trình (4):
+Ap.​pL​=mt.​(ddxp/ddt)​​+Bp.​(dxp​​/dt)+K.xp​+FL
+Trong đó, Bp​ là hệ số giảm chấn tương ứng với piston và tải, và K là độ cứng tương ứng với nhóm tải. Các phương trình (1), (3) và (4) mô tả đặc tính động của xi lanh thủy lực điều khiển bằng van.
+Biến đổi Laplace các phương trình vi phân (1), (3), (4):
+qL​=Kq.​Xv​−Ke.​pL
+qL​=Ap​.Xp.​s+Ctp​.pL​+(​Vt/4βe).pL​.s
+Ap​.PL​=mt​.Xp​.s^2+Bp.​Xp​.s+K.Xp​+FL
+Hàm truyền giữa đầu vào Xv (dịch chuyển con trượt van) và đầu ra Xp​ (dịch chuyển piston) :​​
+Xp = [(Kq/Ap).Xv−(Kce/Ap^2)(1+ (Vt/4βe.Ap^2)s)FL]/[(Vt.mt/(4βe.Ap^2))s^3+(mt.Kce/(Ap^2)+ Bp.Vt/(4βe.Ap^2)s^2+(1+Bp.Kce/(Ap^2)+ K.Vt/(4βe.Ap^2))s+KKce/(Ap^2)]
+K_ce = K_c + C_tp: hệ số tổng hợp áp suất.
+
+
+
+
+
+2. Mô hình hóa van servo
+​Van servo nhận tín hiệu đầu vào là dòng điện, đầu ra là lưu lượng dầu. Đây là phần tử phi tuyến, nhưng có thể xấp xỉ bằng hệ dao động bậc hai khi tần số riêng của van gần với tần số riêng của hệ thủy lực.
+Hàm truyền của van servo:
+Q/I​=Ksf/(s^2/ωf^2​+2.ζf.​s/ωf​+1)
+Van servo đóng vai trò điều chỉnh lưu lượng dầu vào xi lanh, ảnh hưởng trực tiếp đến tốc độ và độ chính xác của hệ thống.
+​​
